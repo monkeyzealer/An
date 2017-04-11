@@ -9,6 +9,12 @@ use App\Article;
 
 class MainController extends Controller
 {
+  public function index()
+  {
+    $articles = Article::orderBy("id", "desc")->take(4)->get();
+
+    return Response::json($articles);
+  }
     public function storeArticle(Request $request)
     {
       $article = new Article;
@@ -16,10 +22,10 @@ class MainController extends Controller
       $article->body = $request->input("body");
       $image = $request->file("image");
       $imageName = $image->getClientOriginalName();
-      $image->move("storage/".$imageName);
-      $article->image = "public/storage/".$imageName;
+      $image->move("storage/",$imageName);
+      $article->image = $request->root()."/storage/".$imageName;
       $article->save();
 
-      return Response::json(["success" => "you did"]);
+      return Response::json(["success" => "you did it"]);
     }
 }

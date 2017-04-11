@@ -14,3 +14,4 @@ use Illuminate\Http\Request;
 */
 
 Route::post("storeArticle", "MainController@storeArticle");
+Route::get("getArticles", "MainController@index");
