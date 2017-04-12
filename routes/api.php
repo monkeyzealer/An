@@ -13,5 +13,8 @@ use Illuminate\Http\Request;
 |
 */
 
+Route::post("updateArticle/{id}", "MainController@updateArticle");
 Route::post("storeArticle", "MainController@storeArticle");
+Route::post("destroyArticle/{id}", "MainController@destroyArticle");
+Route::get("showArticle/{id}", "MainController@showArticle");
 Route::get("getArticles", "MainController@index");
