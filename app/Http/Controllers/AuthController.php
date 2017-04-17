@@ -13,24 +13,33 @@ class AuthController extends Controller
    public function __construct()
    {
      //this makes it so it excepts sign in and sign up
-     $this->middleware("jwt.auth",["except"=>["signIn","signUp"]]);
+     $this->middleware("jwt.auth",["except" => ["signIn","signUp"]]);
    }
   //sign in function lets you sign in and be able to see content that only users can see
    public function signIn(Request $request)
    {
      $email = $request->input("email");
      $password = $request->input("password");
-     //$hash = Hash::make($password);
+     $hash = Hash::make($password);
      //checks to see if the email and password are in the database
-     $check = User::where("email","=",$email)->where("password","=",$password)->first();
+     $check = User::where("email","=",$email)->where("password","=",$hash)->first();
      //if check comes up with the email or password not being in the database it will return saying user not found
      if(empty($check)){
        return Response::json(["empty" => "user not found"]);
      }
      //if check come up with the email and password matching whats in the database it will sign in
       else {
-        $credentials = compact("email","password",["email","password"]);
-        $token = JWTAuth::attempt($credentials);
+        $cred = ["email", "password"];
+        $credentials = compact("email","password",$cred);
+        try {
+          if(!$token = JWTAuth::attempt($credentials)){
+            return Response::json(["error" => "invalid credentials"]);
+          }
+        }
+        catch(JWTException $e)
+        {
+          return Response::json(["error" => "Can't create token"]);
+        }
         return Response::json(compact("token"));
       }
    }

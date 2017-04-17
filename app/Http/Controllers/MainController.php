@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Response;
 use App\Article;
-
+use Illuminate\Support\Facades\Validator;
+use Purifier;
 
 class MainController extends Controller
 {
@@ -22,6 +23,19 @@ class MainController extends Controller
   }
     public function storeArticle(Request $request)
     {
+      $rules = [
+        "title" => "required",
+        "body" => "required",
+        "image" => "required"
+      ];
+
+       $Validator = Validator::make(Purifier::clean($request->all()),$rules);//passes data
+
+       if($Validator->fails())
+       {
+         return Response::json(["error" => "You need to fill out all fields"]);
+       }
+
       $article = new Article;
       $article->subject = $request->input("subject");
       $article->body = $request->input("body");
