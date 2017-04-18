@@ -7,9 +7,13 @@ use Response;
 use App\Article;
 use Illuminate\Support\Facades\Validator;
 use Purifier;
+use JWTAuth;
 
 class MainController extends Controller
 {
+  public function __construct(){
+    $this->middleware("jwt.auth", ["only" => ["storeArticle"]]);
+  }
   public function index()
   {
     $articles = Article::orderBy("id", "desc")->take(4)->get();
@@ -24,7 +28,7 @@ class MainController extends Controller
     public function storeArticle(Request $request)
     {
       $rules = [
-        "title" => "required",
+        "subject" => "required",
         "body" => "required",
         "image" => "required"
       ];

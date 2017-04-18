@@ -7,6 +7,7 @@ use Hash;
 use Response;
 use JWTAuth;
 use Illuminate\Http\Request;
+use Auth;
 
 class AuthController extends Controller
 {
@@ -20,27 +21,20 @@ class AuthController extends Controller
    {
      $email = $request->input("email");
      $password = $request->input("password");
-     $hash = Hash::make($password);
-     //checks to see if the email and password are in the database
-     $check = User::where("email","=",$email)->where("password","=",$hash)->first();
-     //if check comes up with the email or password not being in the database it will return saying user not found
-     if(empty($check)){
-       return Response::json(["empty" => "user not found"]);
-     }
+     //checks to see if the email and password are in the database and aren't null
+     $check = User::where("email","=",$email)->where("password","!=",NULL)->first();
      //if check come up with the email and password matching whats in the database it will sign in
+     if(!empty($check)){
+       $cred = ["email", "password"];
+       $credentials = compact("email","password",$cred);
+
+       $token = JWTAuth::attempt($credentials);
+
+       return Response::json(compact("token"));
+     }
+      //if check comes up with the email or password not being in the database it will return saying user not found
       else {
-        $cred = ["email", "password"];
-        $credentials = compact("email","password",$cred);
-        try {
-          if(!$token = JWTAuth::attempt($credentials)){
-            return Response::json(["error" => "invalid credentials"]);
-          }
-        }
-        catch(JWTException $e)
-        {
-          return Response::json(["error" => "Can't create token"]);
-        }
-        return Response::json(compact("token"));
+        return Response::json(["empty" => "user not found"]);
       }
    }
    //sign up function lets you sign up and if successful will allow you to sign in
@@ -56,6 +50,7 @@ class AuthController extends Controller
        $user = new User;
        $user->name = $username;
        $user->email = $email;
+       $user->roleID = 2;
        //hash:make() makes the password encrypted in the database
        $user->password = Hash::make($password);
        $user->save();
@@ -66,5 +61,12 @@ class AuthController extends Controller
      else {
        return Response::json(["error" => "user already exists"]);
      }
+   }
+   public function getUser(){
+     $user = Auth::user();
+
+     $user = User::find($user->id);
+
+     return Response::json(["user" => $user]);
    }
 }
