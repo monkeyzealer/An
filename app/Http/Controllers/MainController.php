@@ -53,14 +53,29 @@ class MainController extends Controller
     }
     public function updateArticle($id, Request $request)
     {
+      $rules = [
+        "subject" => "required",
+        "body" => "required",
+      ];
+
+       $Validator = Validator::make(Purifier::clean($request->all()),$rules);//passes data
+
+       if($Validator->fails())
+       {
+         return Response::json(["error" => "You need to fill out all fields"]);
+       }
+
       $article = Article::find($id);
       $article->subject = $request->input("subject");
       $article->body = $request->input("body");
 
       $image = $request->file("image");
-      $imageName = $image->getClientOriginalName();
-      $image->move("storage/",$imageName);
-      $article->image = $request->root()."/storage/".$imageName;
+      if(!empty($image))
+      {
+        $imageName = $image->getClientOriginalName();
+        $image->move("storage/",$imageName);
+        $article->image = $request->root()."/storage/".$imageName;
+      }
       $article->save();
 
       return Response::json(["success" => "Post Updated"]);
