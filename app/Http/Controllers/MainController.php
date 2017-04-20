@@ -12,7 +12,7 @@ use JWTAuth;
 class MainController extends Controller
 {
   public function __construct(){
-    $this->middleware("jwt.auth", ["only" => ["storeArticle"]]);
+    $this->middleware("jwt.auth", ["only" => ["storeArticle", "destroyArticle"]]);
   }
   public function index()
   {
