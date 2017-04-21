@@ -8,6 +8,7 @@ use App\Article;
 use Illuminate\Support\Facades\Validator;
 use Purifier;
 use JWTAuth;
+use Auth;
 
 class MainController extends Controller
 {
@@ -40,6 +41,12 @@ class MainController extends Controller
          return Response::json(["error" => "You need to fill out all fields"]);
        }
 
+      $user = Auth::user();
+      if($user->roleID != 1)
+      {
+        return Response::json(["error" => "Your not authorized to do this"]);
+      }
+
       $article = new Article;
       $article->subject = $request->input("subject");
       $article->body = $request->input("body");
@@ -65,6 +72,12 @@ class MainController extends Controller
          return Response::json(["error" => "You need to fill out all fields"]);
        }
 
+       $user = Auth::user();
+       if($user->roleID != 1)
+       {
+         return Response::json(["error" => "Your not authorized to do this"]);
+       }
+
       $article = Article::find($id);
       $article->subject = $request->input("subject");
       $article->body = $request->input("body");
@@ -86,6 +99,11 @@ class MainController extends Controller
       return Response::json($article);
     }
     public function destroyArticle($id) {
+      $user = Auth::user();
+      if($user->roleID != 1)
+      {
+        return Response::json(["error" => "Your not authorized to do this"]);
+      }
       $article = Article::find($id);
       $article->delete();
       return Response::json(["success" => "Deleted Article"]);
