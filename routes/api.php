@@ -21,3 +21,5 @@ Route::post("destroyArticle/{id}", "MainController@destroyArticle");
 Route::get("showArticle/{id}", "MainController@showArticle");
 Route::get("getArticles", "MainController@index");
 Route::get("getUser", "AuthController@getUser");
+Route::get("getComments/{id}", "CommentsController@index");
+Route::post("storeComment", "CommentsController@store");
