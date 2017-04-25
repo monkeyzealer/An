@@ -23,3 +23,4 @@ Route::get("getArticles", "MainController@index");
 Route::get("getUser", "AuthController@getUser");
 Route::get("getComments/{id}", "CommentsController@index");
 Route::post("storeComment", "CommentsController@store");
+Route::post("deleteComment/{id}", "CommentsController@deleteComment");

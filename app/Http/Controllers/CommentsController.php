@@ -24,6 +24,7 @@ class CommentsController extends Controller
         ->join("users", "comments.userID", "=", "users.id")
         ->select("comments.id", "comments.body", "comments.created_at", "users.name")
         ->orderBy("id", "desc")
+        ->take(5)
         ->get();
 
         foreach($comments as $key => $comment)
@@ -59,6 +60,23 @@ class CommentsController extends Controller
       $comment->body = $request->input("commentBody");
       $comment->save();
 
-      return Response::json(["Success" => "You did it!"]);
+      $commentData = Comment::where("comments.id", "=", $comment->id)
+        ->join("users", "comments.userID", "=", "users.id")
+        ->select("comments.id", "comments.body", "comments.created_at", "users.name")
+        ->first();
+      $commentData->commentDate = Carbon::createFromTimeStamp(strtotime($commentData->created_at))->diffForHumans();
+
+      return Response::json(["success" => "You did it!", "data" => $commentData]);
+    }
+    public function deleteComment($id)
+    {
+      $user = Auth::user();
+      if($user->roleID != 1)
+      {
+        return Response::json(["error" => "Your not authorize to do this"]);
+      }
+      $comment = Comment::find($id);
+      $comment->delete();
+      return Response::json(["success" => "Deleted Comment"]);
     }
 }
