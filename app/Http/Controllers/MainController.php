@@ -9,11 +9,16 @@ use Illuminate\Support\Facades\Validator;
 use Purifier;
 use JWTAuth;
 use Auth;
+use File;
 
 class MainController extends Controller
 {
   public function __construct(){
     $this->middleware("jwt.auth", ["only" => ["storeArticle", "destroyArticle"]]);
+  }
+  public function home()
+  {
+    return File::get("index.html");
   }
   public function index()
   {

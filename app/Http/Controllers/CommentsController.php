@@ -16,7 +16,7 @@ use Response;
 class CommentsController extends Controller
 {
   public function __construct(){
-    $this->middleware("jwt.auth", ["only" => ["store"]]);
+    $this->middleware("jwt.auth", ["only" => ["store", "deleteComment"] ]);
   }
     public function index($id)
     {
